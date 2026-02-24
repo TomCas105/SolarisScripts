@@ -64,6 +64,7 @@ public sealed class AssetManager
     public Dictionary<string, TurretData> turretDatas;
     public Dictionary<string, EquipmentData> equipmentDatas;
     public Dictionary<string, ShipData> shipDatas;
+    public Dictionary<string, ShipLoadoutData> shipLoadouts;
 
     private AssetManager()
     {
@@ -78,6 +79,7 @@ public sealed class AssetManager
         turretDatas = new();
         equipmentDatas = new();
         shipDatas = new();
+        shipLoadouts = new();
 
         loadedMaterials = new();
     }
@@ -258,6 +260,16 @@ public sealed class AssetManager
         shipDatas.Add(_ship.id, _ship);
     }
 
+    public void AddShipLoadoutData(ShipLoadoutData _loadout)
+    {
+        if (shipLoadouts.ContainsKey(_loadout.id))
+        {
+            Log("replacing ship loadout: " + _loadout.id, LOG_WARNING);
+            shipLoadouts.Remove(_loadout.id);
+        }
+        shipLoadouts.Add(_loadout.id, _loadout);
+    }
+
     public SoundData GetSoundData(string _id)
     {
         if (soundDatas.ContainsKey(_id))
@@ -334,6 +346,15 @@ public sealed class AssetManager
         if (shipDatas.ContainsKey(_id))
         {
             return shipDatas[_id];
+        }
+        return null;
+    }
+
+    public ShipLoadoutData GetShipLoadoutData(string _id)
+    {
+        if (shipLoadouts.ContainsKey(_id))
+        {
+            return shipLoadouts[_id];
         }
         return null;
     }

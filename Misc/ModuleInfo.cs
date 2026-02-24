@@ -21,7 +21,8 @@ public class ModuleInfo
         { "Armor", typeof(ArmorData) },
         { "Turret", typeof(TurretData) },
         { "Equipment", typeof(EquipmentData) },
-        { "Ship", typeof(ShipData) }
+        { "Ship", typeof(ShipData) },
+        { "ShipLoadout", typeof(ShipLoadoutData) }
     };
 
     private static readonly Dictionary<Type, Action<DataDefinition>> registryMap = new()
@@ -36,6 +37,7 @@ public class ModuleInfo
         { typeof(TurretData), d => AssetManager.Instance.AddTurretData((TurretData)d) },
         { typeof(EquipmentData), d => AssetManager.Instance.AddEquipmentData((EquipmentData)d) },
         { typeof(ShipData), d => AssetManager.Instance.AddShipData((ShipData)d) },
+        { typeof(ShipLoadoutData), d => AssetManager.Instance.AddShipLoadoutData((ShipLoadoutData)d)   }
     };
 
     public string id = "id";
