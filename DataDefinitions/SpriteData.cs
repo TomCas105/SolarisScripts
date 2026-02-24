@@ -17,7 +17,7 @@ public record SpriteData : DataDefinition
         }
     }
 
-    public string type = "standard"; //standard for faction variants, random for random sprites
+    public string type = "standard"; //standard for faction variants, random for randomly picked sprites
     public string spriteDefault = "sprite.png";
     public int pixelsPerUnit = 100; //should be kept at 100 for ships
     public string[] randomSprites = {};
@@ -32,12 +32,16 @@ public record SpriteData : DataDefinition
         LoadedSpriteVariants = new();
         LoadedRandomSprites = new();
     }
+    public override void OnPostLoad(string modulePath)
+    {
+        LoadSprites(modulePath);
+    }
 
-    public void Merge(SpriteData _other)
+    public void Merge(SpriteData other)
     {
         if (type == "random")
         {
-            foreach (var _sprite in _other.LoadedRandomSprites)
+            foreach (var _sprite in other.LoadedRandomSprites)
             {
                 LoadedRandomSprites.Add(_sprite);
             }
@@ -45,7 +49,7 @@ public record SpriteData : DataDefinition
             return;
         }
 
-        var _variants = _other.LoadedSpriteVariants;
+        var _variants = other.LoadedSpriteVariants;
 
         foreach (var _variant in _variants)
         {
@@ -60,12 +64,12 @@ public record SpriteData : DataDefinition
         }
     }
 
-    public bool HasVariant(string _variant)
+    public bool HasVariant(string variant)
     {
-        return LoadedSpriteVariants.ContainsKey(_variant);
+        return LoadedSpriteVariants.ContainsKey(variant);
     }
 
-    public Sprite GetSprite(string _variant = "")
+    public Sprite GetSprite(string variant = "")
     {
         if (type == "random")
         {
@@ -76,13 +80,13 @@ public record SpriteData : DataDefinition
             return LoadedSpriteDefault;
         }
 
-        if (_variant == "")
+        if (variant == "")
         {
             return LoadedSpriteDefault;
         }
         else
         {
-            return LoadedSpriteVariants[_variant];
+            return LoadedSpriteVariants[variant];
         }
     }
 
@@ -96,18 +100,18 @@ public record SpriteData : DataDefinition
         return LoadedSpriteDefault;
     }
 
-    public void LoadSprites(string _modulePath)
+    public void LoadSprites(string modulePath)
     {
         if (type == "random")
         {
             foreach (var _sprite in randomSprites)
             {
-                LoadedRandomSprites.Add(LoadSprite(_modulePath + "/Textures/" + _sprite));
+                LoadedRandomSprites.Add(LoadSprite(modulePath + "/Textures/" + _sprite));
             }
             return;
         }
 
-        LoadedSpriteDefault = LoadSprite(_modulePath + "/Textures/" + spriteDefault);
+        LoadedSpriteDefault = LoadSprite(modulePath + "/Textures/" + spriteDefault);
 
         if (type == "single")
         {
@@ -116,13 +120,13 @@ public record SpriteData : DataDefinition
 
         foreach (var _variant in spriteVariants)
         {
-            LoadedSpriteVariants.Add(_variant.variant, LoadSprite(_modulePath + "/Textures/" + _variant.variantSprite));
+            LoadedSpriteVariants.Add(_variant.variant, LoadSprite(modulePath + "/Textures/" + _variant.variantSprite));
         }
     }
 
-    private Sprite LoadSprite(string _path)
+    private Sprite LoadSprite(string path)
     {
-        Texture2D _texture = AssetManager.LoadTexture(_path);
+        Texture2D _texture = AssetManager.LoadTexture(path);
 
         if (_texture == null)
         {

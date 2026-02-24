@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Serializable]
 public record EquipmentBaseData : DataDefinition
 {
     public string name = "Equipment";
@@ -12,6 +13,7 @@ public record EquipmentBaseData : DataDefinition
     public Vector2 iconOffset = Vector2.zero; //offset of the UI icon
 }
 
+[System.Serializable]
 public record EquipmentData : EquipmentBaseData
 {
     public string equipmentType = "module"; //refit or module, module usually provides stat bonuses and have weight, refits usually provide stat multipliers or stat factors and have 0 weight

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -19,7 +17,7 @@ public record TurretData : EquipmentBaseData
     public int burstCount = 1; //number of attacks in one burst, must be 1 or more
     public float burstPeriod = 0.5f; //delay between attacks in burst in seconds
     public float turnRate = 10f; //degrees per second
-    public float accuracy = 5f; //accuracy in degrees, lower is better, should be 0 for constant beam weapons
+    public float spread = 5f; //accuracy in degrees, lower is better, should be 0 for constant beam weapons
     public float launchRecoil = 1f; //force in MN that pushes the ship back after attack
     public bool pointDefense = false; //whether it can target missiles / fighters
 
