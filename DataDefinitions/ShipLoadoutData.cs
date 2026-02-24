@@ -15,4 +15,5 @@
 
     public string[] modules = { };
     public string[] refits = { };
+    public LoadoutTurret[] turrets = { };
 }

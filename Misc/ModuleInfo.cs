@@ -106,7 +106,7 @@ public class ModuleInfo
                         continue;
                     }
 
-                    Register(data);
+                    RegisterItem(data);
                 }
                 catch (Exception e)
                 {
@@ -136,7 +136,7 @@ public class ModuleInfo
         return (DataDefinition)JsonConvert.DeserializeObject(json, targetType);
     }
 
-    private void Register(DataDefinition data)
+    private void RegisterItem(DataDefinition data)
     {
         if (registryMap.TryGetValue(data.GetType(), out var action))
         {
