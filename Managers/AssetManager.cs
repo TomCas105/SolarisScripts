@@ -121,7 +121,7 @@ public sealed class AssetManager
             }
         }
 
-        //Mod modules
+        //Mods
         var _modFolders = AssetDatabase.GetSubFolders("Assets/Data/Mods");
         foreach (var _folder in _modFolders)
         {
