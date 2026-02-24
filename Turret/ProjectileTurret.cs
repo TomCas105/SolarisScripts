@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 
 public class ProjectileTurret : Turret
@@ -45,7 +46,7 @@ public class ProjectileTurret : Turret
         StatMod _fireRate = StatMod.Identity;
         StatMod _range = StatMod.Identity;
         StatMod _turnRate = StatMod.Identity;
-        StatMod _accuracy = StatMod.Identity;
+        StatMod _spread = StatMod.Identity;
         StatMod _heatLoad = StatMod.Identity;
         StatMod _energyDraw = StatMod.Identity;
         StatMod _weight = StatMod.Identity;
@@ -74,7 +75,7 @@ public class ProjectileTurret : Turret
                     _fireRate.Add(0f, buff.Get("FireRate", "Multiplier"), buff.Get("FireRate", "Factor"));
                     _range.Add(buff.Get("Range", "Bonus"), buff.Get("Range", "Multiplier"), buff.Get("Range", "Factor"));
                     _turnRate.Add(buff.Get("TurnRate", "Bonus"), buff.Get("TurnRate", "Multiplier"), buff.Get("TurnRate", "Factor"));
-                    _accuracy.Add(0f, buff.Get("Accuracy", "Multiplier"), buff.Get("Accuracy", "Factor"));
+                    _spread.Add(0f, buff.Get("Spread", "Multiplier"), buff.Get("Spread", "Factor"));
                     _heatLoad.Add(0f, buff.Get("HeatLoad", "Multiplier"), buff.Get("HeatLoad", "Factor"));
                     _energyDraw.Add(0f, buff.Get("EnergyDraw", "Multiplier"), buff.Get("EnergyDraw", "Factor"));
                     _weight.Add(0f, buff.Get("Weight", "Multiplier"), buff.Get("Weight", "Factor"));
@@ -114,7 +115,7 @@ public class ProjectileTurret : Turret
 
         Range = _range.Apply(turretData.range);
         TurnRate = _turnRate.Apply(turretData.turnRate);
-        Accuracy = _accuracy.Apply(turretData.accuracy);
+        Spread = _spread.Apply(turretData.spread);
         HeatLoad = _heatLoad.Apply(turretData.heatLoad);
         EnergyCost = _energyDraw.Apply(turretData.energyCost);
         Weight = _weight.Apply(turretData.weight);
@@ -177,7 +178,7 @@ public class ProjectileTurret : Turret
                 _projectile.homingTarget = currentTarget;
             }
 
-            _projectile.transform.rotation = Quaternion.Euler(0f, 0f, _angle + Random.Range(-Accuracy, Accuracy));
+            _projectile.transform.rotation = Quaternion.Euler(0f, 0f, _angle + Random.Range(-Spread, Spread));
             _projectile.transform.position = _launchPoint;
 
             _projectile.InitializeProjectile(turretFaction, projectileSprite, turretData.trail ? turretData.trailData : null);
@@ -204,14 +205,24 @@ public class ProjectileTurret : Turret
         }
     }
 
-    protected override bool CanFireAt(TargetFilter _target)
+    protected override bool CanFireAt(TargetFilter target)
     {
         //check range
-        var _targetPosition = (Vector2)_target.transform.position;
-        float _dist = Vector2.Distance(_targetPosition, transform.position);
-        _targetPosition += _target.GetVelocity() * (_dist / ProjectileVelocity);
-        _dist = Vector2.Distance(_targetPosition, transform.position);
-        if (_dist > Range)
+        Vector2 _transformPos = transform.position;
+        Vector2 _targetPos = target.transform.position;
+
+        Vector2 _toTarget = _targetPos - _transformPos;
+        float _distSqr = _toTarget.sqrMagnitude;
+
+        float _rangeSqr = Range * Range;
+
+        float _approxDist = Mathf.Sqrt(_distSqr); // iba raz
+        float _timeToHit = _approxDist / ProjectileVelocity;
+
+        Vector2 _predictedPos = _targetPos + target.GetVelocity() * _timeToHit;
+        Vector2 _predictedDelta = _predictedPos - _transformPos;
+
+        if (_predictedDelta.sqrMagnitude > _rangeSqr)
         {
             return false;
         }
@@ -222,12 +233,13 @@ public class ProjectileTurret : Turret
             return true;
         }
 
-        float _angle = GetAngleToTarget(_target);
+        float _angleToTarget = Mathf.Atan2(_predictedDelta.y, _predictedDelta.x) * Mathf.Rad2Deg - 90f;
+
         float _defaultFacingAngle = transform.eulerAngles.z - transform.localEulerAngles.z + baseFacingAngle;
 
-        float _delta = Mathf.DeltaAngle(_defaultFacingAngle, _angle);
+        float _deltaAngle = Mathf.DeltaAngle(_defaultFacingAngle, _angleToTarget);
 
-        if (Mathf.Abs(_delta) > turningArc / 2f)
+        if (_deltaAngle > turningArc * 0.5f)
         {
             return false;
         }

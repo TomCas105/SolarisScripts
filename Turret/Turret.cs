@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEditor.Overlays;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 [System.Serializable]
 public record TurretHardpoint
@@ -77,7 +78,7 @@ public abstract class Turret : MonoBehaviour
     public float Period { get; protected set; }
     public int BurstCount { get; protected set; }
     public float BurstPeriod { get; protected set; }
-    public float Accuracy { get; protected set; }
+    public float Spread { get; protected set; }
     public float TurnRate { get; protected set; }
     public float LaunchRecoil { get; protected set; }
 
@@ -139,7 +140,7 @@ public abstract class Turret : MonoBehaviour
         if (retargetDelay <= 0f)
         {
             FindNewTarget();
-            retargetDelay = 0.25f;
+            retargetDelay = 1f;
         }
         else
         {
@@ -244,11 +245,11 @@ public abstract class Turret : MonoBehaviour
         StatMod _heatDamage = StatMod.Identity;
         StatMod _crewDamage = StatMod.Identity;
         StatMod _penetration = StatMod.Identity;
-        
+
         StatMod _fireRate = StatMod.Identity;
         StatMod _range = StatMod.Identity;
         StatMod _turnRate = StatMod.Identity;
-        StatMod _accuracy = StatMod.Identity;
+        StatMod _spread = StatMod.Identity;
         StatMod _heatLoad = StatMod.Identity;
         StatMod _energyDraw = StatMod.Identity;
         StatMod _weight = StatMod.Identity;
@@ -272,7 +273,7 @@ public abstract class Turret : MonoBehaviour
                     _fireRate.Add(0f, buff.Get("FireRate", "Multiplier"), buff.Get("FireRate", "Factor"));
                     _range.Add(buff.Get("Range", "Bonus"), buff.Get("Range", "Multiplier"), buff.Get("Range", "Factor"));
                     _turnRate.Add(buff.Get("TurnRate", "Bonus"), buff.Get("TurnRate", "Multiplier"), buff.Get("TurnRate", "Factor"));
-                    _accuracy.Add(0f, buff.Get("Accuracy", "Multiplier"), buff.Get("Accuracy", "Factor"));
+                    _spread.Add(0f, buff.Get("Spread", "Multiplier"), buff.Get("Spread", "Factor"));
                     _heatLoad.Add(0f, buff.Get("HeatLoad", "Multiplier"), buff.Get("HeatLoad", "Factor"));
                     _energyDraw.Add(0f, buff.Get("EnergyDraw", "Multiplier"), buff.Get("EnergyDraw", "Factor"));
                     _weight.Add(0f, buff.Get("Weight", "Multiplier"), buff.Get("Weight", "Factor"));
@@ -308,7 +309,7 @@ public abstract class Turret : MonoBehaviour
 
         Range = _range.Apply(turretData.range);
         TurnRate = _turnRate.Apply(turretData.turnRate);
-        Accuracy = _accuracy.Apply(turretData.accuracy);
+        Spread = _spread.Apply(turretData.spread);
         HeatLoad = _heatLoad.Apply(turretData.heatLoad);
         EnergyCost = _energyDraw.Apply(turretData.energyCost);
         Weight = _weight.Apply(turretData.weight);
@@ -383,10 +384,10 @@ public abstract class Turret : MonoBehaviour
                 {
                     if (_target != OwnerShip.ShipTargetFilter && CanFireAt(_target))
                     {
-                        float _range = Vector2.Distance(transform.position, _target.transform.position);
-                        if (_range < _max)
+                        float _rangeSqr = (_target.transform.position - transform.position).sqrMagnitude;
+                        if (_rangeSqr < _max * _max)
                         {
-                            _max = _range;
+                            _max = _rangeSqr;
                             _newTarget = _target;
                         }
                     }
@@ -405,10 +406,10 @@ public abstract class Turret : MonoBehaviour
                     {
                         if (CanFireAt(_target))
                         {
-                            float _range = Vector2.Distance(transform.position, _target.transform.position);
-                            if (_range < _max)
+                            float _rangeSqr = (_target.transform.position - transform.position).sqrMagnitude;
+                            if (_rangeSqr < _max * _max)
                             {
-                                _max = _range;
+                                _max = _rangeSqr;
                                 _newTarget = _target;
                             }
                         }
@@ -425,10 +426,10 @@ public abstract class Turret : MonoBehaviour
                     {
                         if (CanFireAt(_target))
                         {
-                            float _range = Vector2.Distance(transform.position, _target.transform.position);
-                            if (_range < _max)
+                            float _rangeSqr = (_target.transform.position - transform.position).sqrMagnitude;
+                            if (_rangeSqr < _max * _max)
                             {
-                                _max = _range;
+                                _max = _rangeSqr;
                                 _newTarget = _target;
                             }
                         }
@@ -472,11 +473,11 @@ public abstract class Turret : MonoBehaviour
 
                 if (BurstCount > 1 && burstCountRemaining > 0)
                 {
-                    currentAttackDelay = BurstPeriod * Random.Range(0.95f, 1.05f);
+                    currentAttackDelay = BurstPeriod;
                 }
                 else
                 {
-                    currentAttackDelay = Period * Random.Range(0.95f, 1.05f) / OwnerShip.OperationalCrewPercentage;
+                    currentAttackDelay = Period * Random.Range(0.9f, 1.1f) / OwnerShip.OperationalCrewPercentage;
                     if (BurstCount > 1)
                     {
                         burstCountRemaining = BurstCount;
@@ -500,28 +501,34 @@ public abstract class Turret : MonoBehaviour
         launchPointSwitch = (launchPointSwitch + 1) % turretData.launchPoints.Length;
     }
 
-    protected virtual bool CanFireAt(TargetFilter _target)
+    protected virtual bool CanFireAt(TargetFilter target)
     {
-        //not in distance
-        var _targetPosition = _target.transform.position;
-        float _dist = Vector2.Distance(_targetPosition, transform.position);
-        if (_dist > Range)
+        Vector2 _transformPos = transform.position;
+        Vector2 _targetPos = target.transform.position;
+
+        Vector2 _delta = _targetPos - _transformPos;
+        float _distSqr = _delta.sqrMagnitude;
+
+        float _rangeSqr = Range * Range;
+
+        if (_distSqr > _rangeSqr)
         {
             return false;
         }
 
-        //not in turret attack arc
         if (turningArc < 0f)
         {
             return true;
         }
 
-        float _angle = GetAngleToTarget(_target);
-        float _defaultFacingAngle = transform.eulerAngles.z - transform.localEulerAngles.z + baseFacingAngle;
+        float _angleToTarget = Mathf.Atan2(_delta.y, _delta.x) * Mathf.Rad2Deg - 90f;
 
-        float _delta = Mathf.DeltaAngle(_defaultFacingAngle, _angle);
+        float _defaultFacingAngle =
+            transform.eulerAngles.z - transform.localEulerAngles.z + baseFacingAngle;
 
-        if (Mathf.Abs(_delta) > turningArc / 2f)
+        float _deltaAngle = Mathf.DeltaAngle(_defaultFacingAngle, _angleToTarget);
+
+        if (_deltaAngle > turningArc * 0.5f)
         {
             return false;
         }
@@ -602,7 +609,7 @@ public abstract class Turret : MonoBehaviour
         float _targetAngle = currentTarget != null
             ? GetAngleToTarget(currentTarget)
             : transform.eulerAngles.z - transform.localEulerAngles.z + baseFacingAngle;
-        TurnTowards(_targetAngle, TurnRate * Time.deltaTime * OwnerShip.OperationalCrewPercentage);
+        TurnTowards(_targetAngle, TurnRate * Time.fixedDeltaTime * OwnerShip.OperationalCrewPercentage);
     }
 
     public Transform GetTurretVisual()

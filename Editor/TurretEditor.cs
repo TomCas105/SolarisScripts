@@ -104,7 +104,7 @@ public class TurretEditor : Editor
                 Handles.color = new Color(0, 0, 1, 0.85f);
                 Handles.DrawLine(_turret.transform.position + _sideOffset, _position, 6f * (1 + _turret.GetTurretType().size));
 
-                float _arc = _turret.Accuracy;
+                float _arc = _turret.Spread;
                 Color _fill = new Color(1, 1, 0, 0.07f / _turret.GetTurretType().launchPoints.Length);
                 Color _edge = new Color(1, 1, 0, 0.5f);
                 Handles.color = _fill;
