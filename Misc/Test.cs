@@ -14,6 +14,12 @@ public class Test : MonoBehaviour
     public List<TurretData> turretTypes;
     public List<ShipData> shipTypes;
     public List<SoundData> soundDatas;
+    public List<ArmorData> armorDatas;
+    public List<ShieldData> shieldDatas;
+    public List<BuffData> buffDatas;
+    public List<EffectData> effectDatas;
+    public List<EquipmentData> equipmentDatas;
+    public List<ShipLoadoutData> shipLoadoutDatas;
 
     public List<TargetFilter> targets;
 
@@ -30,43 +36,46 @@ public class Test : MonoBehaviour
 
         _am.LoadModule("core");
 
-        var _spriteVariants = _am.spriteDatas.Values;
-        foreach (var _spriteVariant in _spriteVariants)
-        {
-            spriteVariants.Add(_spriteVariant);
-        }
-        var _soundDatas = _am.soundDatas.Values;
-        foreach (var _soundData in _soundDatas)
-        {
-            soundDatas.Add(_soundData);
-        }
-        var _factions = _am.factionDatas.Values;
-        foreach (var _faction in _factions)
-        {
-            factions.Add(_faction);
-        }
-        var _turretTypes = _am.turretDatas.Values;
-        foreach (var _type in _turretTypes)
-        {
-            turretTypes.Add(_type);
-        }
-        var _shipTypes = _am.shipDatas.Values;
-        foreach (var _type in _shipTypes)
-        {
-            shipTypes.Add(_type);
-        }
+        spriteVariants = new List<SpriteData>();
+        factions = new List<FactionData>();
+        turretTypes = new List<TurretData>();
+        shipTypes = new List<ShipData>();
+        soundDatas = new List<SoundData>();
+        armorDatas = new List<ArmorData>();
+        shieldDatas = new List<ShieldData>();
+        buffDatas = new List<BuffData>();
+        effectDatas = new List<EffectData>();
+        equipmentDatas = new List<EquipmentData>();
+        shipLoadoutDatas = new List<ShipLoadoutData>();
+
+        spriteVariants.AddRange(_am.spriteDataRegistry.Values);
+        factions.AddRange(_am.factionDataRegistry.Values);
+        turretTypes.AddRange(_am.turretDataRegistry.Values);
+        shipTypes.AddRange(_am.shipDataRegistry.Values);
+        soundDatas.AddRange(_am.soundDataRegistry.Values);
+        armorDatas.AddRange(_am.armorDataRegistry.Values);
+        shieldDatas.AddRange(_am.shieldDataRegistry.Values);
+        buffDatas.AddRange(_am.buffDataRegistry.Values);
+        effectDatas.AddRange(_am.effectDataRegistry.Values);
+        equipmentDatas.AddRange(_am.equipmentDataRegistry.Values);
+        shipLoadoutDatas.AddRange(_am.shipLoadoutDataRegistry.Values);
+
         modInfos = AssetManager.Instance.moduleInfos;
         targets = TargetFilter.targets;
     }
 
-    void Update()
+    void LateUpdate()
     {
-    }
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 _mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
 
-    public void SaveIntoJson(object _object, string _path)
-    {
-        string json = JsonUtility.ToJson(_object, true);
-        System.IO.File.WriteAllText(Application.dataPath + "/" + _path, json);
-        Debug.Log("exporting: " + Application.dataPath + "/" + _path);
+            var _ship = Ship.Instantiate(shipLoadoutDatas[0], _mousePos, "pirate");
+        }
+        else if (Input.GetMouseButtonDown(1))
+        {
+            Vector2 _mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            var _ship = Ship.Instantiate(shipLoadoutDatas[0], _mousePos, "player");
+        }
     }
 }

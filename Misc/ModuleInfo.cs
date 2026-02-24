@@ -49,10 +49,12 @@ public class ModuleInfo
     public bool BaseModule { get; set; } = false;
     public bool Enabled { get; set; } = true;
     public string ModulePathPrefix;
+    public string ModuleRootPath;
 
     public void LoadModule()
     {
         string _path = "Assets" + ModulePathPrefix.Substring(Application.dataPath.Length) + "/";
+        ModuleRootPath = _path;
 
         LoadData(_path + "Defs");
     }
@@ -105,6 +107,8 @@ public class ModuleInfo
                         AssetManager.Log("failed: " + _json.FullName, AssetManager.LOG_ERROR);
                         continue;
                     }
+
+                    data.OnPostLoad(ModuleRootPath);
 
                     RegisterItem(data);
                 }

@@ -108,7 +108,7 @@ public class Starmap : MonoBehaviour
         }
 
         List<StarmapSystem> _freeSystems = new(systems);
-        foreach (var _faction in AssetManager.Instance.factionDatas.Values)
+        foreach (var _faction in AssetManager.Instance.factionDataRegistry.Values)
         {
             var _system = _freeSystems[Random.Range(0, _freeSystems.Count)];
             var _takenSystems = InitFaction(_system, _faction);
