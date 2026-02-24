@@ -352,6 +352,12 @@ public sealed class AssetManager
         if (spriteDatas != null && spriteDatas.ContainsKey(_id))
         {
             var _sv = spriteDatas[_id];
+
+            if (_variants == null || _variants.Count == 0)
+            {
+                return _sv.GetDefaultSprite();
+            }
+
             foreach (var _variant in _variants)
             {
                 if (_sv.HasVariant(_variant))
@@ -359,6 +365,7 @@ public sealed class AssetManager
                     return _sv.GetSprite(_variant);
                 }
             }
+
             return _sv.GetDefaultSprite(); ;
         }
         return null;

@@ -1,8 +1,9 @@
 using Newtonsoft.Json;
 using System;
-using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -52,19 +53,6 @@ public class ModuleInfo
         string _path = "Assets" + ModulePathPrefix.Substring(Application.dataPath.Length) + "/";
 
         LoadData(_path + "Defs");
-
-        /*
-        LoadData<SpriteData>(_path + "Sprites", AssetManager.Instance.AddSpriteData);
-        LoadData<SoundData>(_path + "Sounds", AssetManager.Instance.AddSoundData);
-        LoadData<EffectData>(_path + "Effects", AssetManager.Instance.AddEffectData);
-        LoadData<BuffData>(_path + "Buffs", AssetManager.Instance.AddBuffData);
-        LoadData<FactionData>(_path + "Factions", AssetManager.Instance.AddFaction);
-        LoadData<ShieldData>(_path + "Equipment/Shields", AssetManager.Instance.AddShieldData);
-        LoadData<ArmorData>(_path + "Equipment/Armors", AssetManager.Instance.AddArmorData);
-        LoadData<TurretData>(_path + "Equipment/Turrets", AssetManager.Instance.AddTurretData);
-        LoadData<EquipmentData>(_path + "Equipment/Equipment", AssetManager.Instance.AddEquipmentData);
-        LoadData<ShipData>(_path + "Ships", AssetManager.Instance.AddShipData);
-        */
     }
 
     private FileInfo[] GetJSONFiles(string _directory)
@@ -131,23 +119,19 @@ public class ModuleInfo
 
     private DataDefinition DeserializeJSON(string json)
     {
-        DataDefinition baseData = JsonUtility.FromJson<DataDefinition>(json);
+        var _baseData = JsonConvert.DeserializeObject<DataDefinition>(json);
 
-        if (baseData == null || string.IsNullOrEmpty(baseData.dataType))
+        if (_baseData == null || string.IsNullOrEmpty(_baseData.dataType))
         {
-            Debug.LogError("Invalid or missing dataType.");
             return null;
         }
 
-        if (!typeMap.TryGetValue(baseData.dataType, out Type targetType))
+        if (!typeMap.TryGetValue(_baseData.dataType, out var targetType))
         {
-            Debug.LogError($"Unknown dataType: {baseData.dataType}");
             return null;
         }
 
-        DataDefinition finalData = (DataDefinition)JsonUtility.FromJson(json, targetType);
-
-        return finalData;
+        return (DataDefinition)JsonConvert.DeserializeObject(json, targetType);
     }
 
     private void Register(DataDefinition data)
@@ -159,37 +143,6 @@ public class ModuleInfo
         else
         {
             AssetManager.Log($"Missing registry for type {data.GetType().Name}", AssetManager.LOG_ERROR);
-        }
-    }
-
-    private void LoadData<T>(string folderPath, Action<T> registerCallback)
-    {
-        foreach (var folder in GetAllSubfolders(folderPath))
-        {
-            var jsons = GetJSONFiles(folder);
-
-            foreach (var json in jsons)
-            {
-                AssetManager.Log("loading: " + json.FullName, AssetManager.LOG_NORMAL);
-
-                try
-                {
-                    using var sr = json.OpenText();
-                    var data = JsonUtility.FromJson<T>(sr.ReadToEnd());
-
-                    if (data == null)
-                    {
-                        AssetManager.Log("loading failed: " + json.FullName, AssetManager.LOG_ERROR);
-                        continue;
-                    }
-
-                    registerCallback.Invoke(data);
-                }
-                catch
-                {
-                    AssetManager.Log("loading failed: " + json.FullName, AssetManager.LOG_ERROR);
-                }
-            }
         }
     }
 }
