@@ -25,6 +25,7 @@ public class Ship : MonoBehaviour
     {
         var _shipType = AssetManager.Instance.GetShipData(_shipID);
 
+
         if (_shipType == null)
         {
             return null;
@@ -34,6 +35,37 @@ public class Ship : MonoBehaviour
         _ship.shipType = _shipType;
         _ship.ShipFactionID = _factionID;
         _ship.transform.position = _position;
+
+        return _ship;
+    }
+
+    public static Ship Instantiate(ShipLoadoutData shipLoadoutData, Vector2 _position, string _factionID = "pirate")
+    {
+        var _ship = Instantiate(shipLoadoutData.shipID, _position, _factionID);
+
+        if (_ship == null)
+        {
+            return null;
+        }
+
+        _ship.Armor = AssetManager.Instance.GetArmorData(shipLoadoutData.armorID);
+        _ship.CurrentArmorCount = shipLoadoutData.armorCount;
+        _ship.Shield = AssetManager.Instance.GetShieldData(shipLoadoutData.shieldID);
+        _ship.CurrentShieldCount = shipLoadoutData.shieldCount;
+
+        foreach (var _module in shipLoadoutData.equipment)
+        {
+            _ship.AddEquipment(_module);
+        }
+
+        _ship.InitializeShip();
+
+        foreach (var _turret in shipLoadoutData.turrets)
+        {
+            _ship.SetTurret(_turret.turretID, _turret.hardpoint);
+        }
+
+        _ship.InitializeStats();
 
         return _ship;
     }
@@ -106,11 +138,9 @@ public class Ship : MonoBehaviour
     //equipment
     public ArmorData Armor { get; set; }
     public int MaxArmorCount { get; private set; }
-    public int EquippedArmorCount { get; set; }
     public int CurrentArmorCount { get; private set; }
     public ShieldData Shield { get; set; }
     public int MaxShieldCount { get; private set; }
-    public int EquippedShieldCount { get; set; }
     public int CurrentShieldCount { get; private set; }
     public List<EquipmentData> EquippedRefits { get; private set; }
     public List<EquipmentData> EquippedModules { get; private set; }
@@ -275,6 +305,11 @@ public class Ship : MonoBehaviour
         {
             sprite = AssetManager.Instance.GetSprite(shipType.shipSpriteID);
             shieldSprite = AssetManager.Instance.GetSprite(shipType.shieldSpriteID);
+        }
+
+        if (sprite == null)
+        {
+            AssetManager.Log($"Failed to load sprite for ship: {shipType.id}", AssetManager.LOG_ERROR);
         }
 
         WireframeSprite = AssetManager.Instance.GetSprite(shipType.wireframeSpriteID);
@@ -517,7 +552,6 @@ public class Ship : MonoBehaviour
         MaxArmorCount = _armorCount.ApplyInt(shipType.maxArmor);
         if (Armor != null)
         {
-            CurrentArmorCount = EquippedArmorCount;
             MaxArmorHitpoints = _armorHP.Apply(Armor.armorHitpoints) * CurrentArmorCount;
             ArmorThickness = _armorThickness.Apply(Armor.armorThickness) * CurrentArmorCount;
             ArmorQuality = _armorQuality.Apply(Armor.armorQuality);
@@ -529,7 +563,6 @@ public class Ship : MonoBehaviour
         MaxShieldCount = _shieldCount.ApplyInt(shipType.maxShield);
         if (Shield != null)
         {
-            CurrentShieldCount = EquippedShieldCount;
             MaxShieldHitpoints = _shieldHP.Apply(Shield.shieldHitpoints) * CurrentShieldCount;
             ShieldDamageThreshold = _shieldThreshold.Apply(Shield.shieldDamageThreshold) * CurrentShieldCount;
             ShieldRegenerationDelay = Shield.shieldRegenerationDelay * _shieldDelayMult * _shieldDelayFact;
@@ -606,8 +639,6 @@ public class Ship : MonoBehaviour
         {
             _targetHardpoint.Turret = Turret.Instantiate(_turretID, TurretsTransform, _targetHardpoint);
         }
-
-        UpdateStats();
     }
 
     public bool TakeDamage(DamageData _damage, Ship _attacker = null, float? _distance = null, float? _maxRange = null, float _hitAngle = 90f)
@@ -1014,7 +1045,6 @@ public class Ship : MonoBehaviour
             }
         }
 
-        UpdateStats();
         UpdateShield();
     }
 
@@ -1033,8 +1063,6 @@ public class Ship : MonoBehaviour
 
         float _maxForwardSpeed = MaxSpeed * verticalLimit;
         float _maxLateralSpeed = MaxSpeed * horizontalLimit;
-
-        Debug.Log($"Forward Speed: {_forwardSpeed}, Lateral Speed: {_lateralSpeed}");
 
         if (Mathf.Abs(vertical) > 0.01f)
         {
