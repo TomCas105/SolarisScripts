@@ -54,32 +54,32 @@ public sealed class AssetManager
     private Dictionary<string, Material> loadedMaterials;
 
     public List<ModuleInfo> moduleInfos;
-    public Dictionary<string, SpriteData> spriteDatas;
-    public Dictionary<string, SoundData> soundDatas;
-    public Dictionary<string, EffectData> effectDatas;
-    public Dictionary<string, BuffData> buffDatas;
-    public Dictionary<string, FactionData> factionDatas;
-    public Dictionary<string, ShieldData> shieldDatas;
-    public Dictionary<string, ArmorData> armorDatas;
-    public Dictionary<string, TurretData> turretDatas;
-    public Dictionary<string, EquipmentData> equipmentDatas;
-    public Dictionary<string, ShipData> shipDatas;
-    public Dictionary<string, ShipLoadoutData> shipLoadouts;
+    public Dictionary<string, SpriteData> spriteDataRegistry;
+    public Dictionary<string, SoundData> soundDataRegistry;
+    public Dictionary<string, EffectData> effectDataRegistry;
+    public Dictionary<string, BuffData> buffDataRegistry;
+    public Dictionary<string, FactionData> factionDataRegistry;
+    public Dictionary<string, ShieldData> shieldDataRegistry;
+    public Dictionary<string, ArmorData> armorDataRegistry;
+    public Dictionary<string, TurretData> turretDataRegistry;
+    public Dictionary<string, EquipmentData> equipmentDataRegistry;
+    public Dictionary<string, ShipData> shipDataRegistry;
+    public Dictionary<string, ShipLoadoutData> shipLoadoutDataRegistry;
 
     private AssetManager()
     {
         moduleInfos = new();
-        spriteDatas = new();
-        soundDatas = new();
-        effectDatas = new();
-        buffDatas = new();
-        factionDatas = new();
-        shieldDatas = new();
-        armorDatas = new();
-        turretDatas = new();
-        equipmentDatas = new();
-        shipDatas = new();
-        shipLoadouts = new();
+        spriteDataRegistry = new();
+        soundDataRegistry = new();
+        effectDataRegistry = new();
+        buffDataRegistry = new();
+        factionDataRegistry = new();
+        shieldDataRegistry = new();
+        armorDataRegistry = new();
+        turretDataRegistry = new();
+        equipmentDataRegistry = new();
+        shipDataRegistry = new();
+        shipLoadoutDataRegistry = new();
 
         loadedMaterials = new();
     }
@@ -89,7 +89,7 @@ public sealed class AssetManager
         if (loadedMaterials.ContainsKey(_material))
         {
             return loadedMaterials[_material];
-        } 
+        }
         else
         {
             var _newMaterial = Resources.Load("TrailMaterial", typeof(Material)) as Material;
@@ -159,220 +159,220 @@ public sealed class AssetManager
 
     public void AddSpriteData(SpriteData _spriteData)
     {
-        if (spriteDatas.ContainsKey(_spriteData.id))
+        if (spriteDataRegistry.ContainsKey(_spriteData.id))
         {
             Log("merging sprites: " + _spriteData.id, LOG_WARNING);
-            spriteDatas[_spriteData.id].Merge(_spriteData);
+            spriteDataRegistry[_spriteData.id].Merge(_spriteData);
         }
         else
         {
-            spriteDatas.Add(_spriteData.id, _spriteData);
+            spriteDataRegistry.Add(_spriteData.id, _spriteData);
         }
     }
 
     public void AddSoundData(SoundData _soundData)
     {
-        if (soundDatas.ContainsKey(_soundData.id))
+        if (soundDataRegistry.ContainsKey(_soundData.id))
         {
             Log("replacing sound: " + _soundData.id, LOG_WARNING);
-            soundDatas.Remove(_soundData.id);
+            soundDataRegistry.Remove(_soundData.id);
         }
-        soundDatas.Add(_soundData.id, _soundData);
+        soundDataRegistry.Add(_soundData.id, _soundData);
     }
 
     public void AddEffectData(EffectData _effectData)
     {
-        if (effectDatas.ContainsKey(_effectData.id))
+        if (effectDataRegistry.ContainsKey(_effectData.id))
         {
             Log("replacing effect: " + _effectData.id, LOG_WARNING);
-            effectDatas.Remove(_effectData.id);
+            effectDataRegistry.Remove(_effectData.id);
         }
-        effectDatas.Add(_effectData.id, _effectData);
+        effectDataRegistry.Add(_effectData.id, _effectData);
     }
 
     public void AddBuffData(BuffData _buffData)
     {
-        if (buffDatas.ContainsKey(_buffData.id))
+        if (buffDataRegistry.ContainsKey(_buffData.id))
         {
             Log("replacing buff: " + _buffData.id, LOG_WARNING);
-            buffDatas.Remove(_buffData.id);
+            buffDataRegistry.Remove(_buffData.id);
         }
-        buffDatas.Add(_buffData.id, _buffData);
+        buffDataRegistry.Add(_buffData.id, _buffData);
     }
 
     public void AddFaction(FactionData _faction)
     {
-        if (factionDatas.ContainsKey(_faction.id))
+        if (factionDataRegistry.ContainsKey(_faction.id))
         {
             Log("replacing faction: " + _faction.id, LOG_WARNING);
-            factionDatas.Remove(_faction.id);
+            factionDataRegistry.Remove(_faction.id);
         }
-        factionDatas.Add(_faction.id, _faction);
+        factionDataRegistry.Add(_faction.id, _faction);
     }
 
     public void AddShieldData(ShieldData _shield)
     {
-        if (shieldDatas.ContainsKey(_shield.id))
+        if (shieldDataRegistry.ContainsKey(_shield.id))
         {
             Log("replacing shield: " + _shield.id, LOG_WARNING);
-            shieldDatas.Remove(_shield.id);
+            shieldDataRegistry.Remove(_shield.id);
         }
-        shieldDatas.Add(_shield.id, _shield);
+        shieldDataRegistry.Add(_shield.id, _shield);
     }
 
     public void AddArmorData(ArmorData _armor)
     {
-        if (armorDatas.ContainsKey(_armor.id))
+        if (armorDataRegistry.ContainsKey(_armor.id))
         {
             Log("replacing armor: " + _armor.id, LOG_WARNING);
-            armorDatas.Remove(_armor.id);
+            armorDataRegistry.Remove(_armor.id);
         }
-        armorDatas.Add(_armor.id, _armor);
+        armorDataRegistry.Add(_armor.id, _armor);
     }
 
     public void AddTurretData(TurretData _turret)
     {
-        if (turretDatas.ContainsKey(_turret.id))
+        if (turretDataRegistry.ContainsKey(_turret.id))
         {
             Log("replacing turret: " + _turret.id, LOG_WARNING);
-            turretDatas.Remove(_turret.id);
+            turretDataRegistry.Remove(_turret.id);
         }
-        turretDatas.Add(_turret.id, _turret);
+        turretDataRegistry.Add(_turret.id, _turret);
     }
 
     public void AddEquipmentData(EquipmentData _equipment)
     {
-        if (equipmentDatas.ContainsKey(_equipment.id))
+        if (equipmentDataRegistry.ContainsKey(_equipment.id))
         {
             Log("replacing equipment: " + _equipment.id, LOG_WARNING);
-            equipmentDatas.Remove(_equipment.id);
+            equipmentDataRegistry.Remove(_equipment.id);
         }
-        equipmentDatas.Add(_equipment.id, _equipment);
+        equipmentDataRegistry.Add(_equipment.id, _equipment);
     }
 
     public void AddShipData(ShipData _ship)
     {
-        if (shipDatas.ContainsKey(_ship.id))
+        if (shipDataRegistry.ContainsKey(_ship.id))
         {
             Log("replacing ship: " + _ship.id, LOG_WARNING);
-            shipDatas.Remove(_ship.id);
+            shipDataRegistry.Remove(_ship.id);
         }
-        shipDatas.Add(_ship.id, _ship);
+        shipDataRegistry.Add(_ship.id, _ship);
     }
 
     public void AddShipLoadoutData(ShipLoadoutData _loadout)
     {
-        if (shipLoadouts.ContainsKey(_loadout.id))
+        if (shipLoadoutDataRegistry.ContainsKey(_loadout.id))
         {
             Log("replacing ship loadout: " + _loadout.id, LOG_WARNING);
-            shipLoadouts.Remove(_loadout.id);
+            shipLoadoutDataRegistry.Remove(_loadout.id);
         }
-        shipLoadouts.Add(_loadout.id, _loadout);
+        shipLoadoutDataRegistry.Add(_loadout.id, _loadout);
     }
 
     public SoundData GetSoundData(string _id)
     {
-        if (soundDatas.ContainsKey(_id))
+        if (soundDataRegistry.ContainsKey(_id))
         {
-            return soundDatas[_id];
+            return soundDataRegistry[_id];
         }
         return null;
     }
 
     public EffectData GetEffectData(string _id)
     {
-        if (effectDatas.ContainsKey(_id))
+        if (effectDataRegistry.ContainsKey(_id))
         {
-            return effectDatas[_id];
+            return effectDataRegistry[_id];
         }
         return null;
     }
     public BuffData GetBuffData(string _id)
     {
-        if (buffDatas.ContainsKey(_id))
+        if (buffDataRegistry.ContainsKey(_id))
         {
-            return buffDatas[_id];
+            return buffDataRegistry[_id];
         }
         return null;
     }
 
     public FactionData GetFaction(string _id)
     {
-        if (factionDatas.ContainsKey(_id))
+        if (factionDataRegistry.ContainsKey(_id))
         {
-            return factionDatas[_id];
+            return factionDataRegistry[_id];
         }
         return null;
     }
 
     public ShieldData GetShieldData(string _id)
     {
-        if (shieldDatas.ContainsKey(_id))
+        if (shieldDataRegistry.ContainsKey(_id))
         {
-            return shieldDatas[_id];
+            return shieldDataRegistry[_id];
         }
         return null;
     }
 
     public ArmorData GetArmorData(string _id)
     {
-        if (armorDatas.ContainsKey(_id))
+        if (armorDataRegistry.ContainsKey(_id))
         {
-            return armorDatas[_id];
+            return armorDataRegistry[_id];
         }
         return null;
     }
 
     public TurretData GetTurretData(string _id)
     {
-        if (turretDatas.ContainsKey(_id))
+        if (turretDataRegistry.ContainsKey(_id))
         {
-            return turretDatas[_id];
+            return turretDataRegistry[_id];
         }
         return null;
     }
 
     public EquipmentData GetEquipmentData(string _id)
     {
-        if (equipmentDatas.ContainsKey(_id))
+        if (equipmentDataRegistry.ContainsKey(_id))
         {
-            return equipmentDatas[_id];
+            return equipmentDataRegistry[_id];
         }
         return null;
     }
 
     public ShipData GetShipData(string _id)
     {
-        if (shipDatas.ContainsKey(_id))
+        if (shipDataRegistry.ContainsKey(_id))
         {
-            return shipDatas[_id];
+            return shipDataRegistry[_id];
         }
         return null;
     }
 
     public ShipLoadoutData GetShipLoadoutData(string _id)
     {
-        if (shipLoadouts.ContainsKey(_id))
+        if (shipLoadoutDataRegistry.ContainsKey(_id))
         {
-            return shipLoadouts[_id];
+            return shipLoadoutDataRegistry[_id];
         }
         return null;
     }
 
     public Sprite GetSprite(string _id, string _variant = "")
     {
-        if (spriteDatas.ContainsKey(_id))
+        if (spriteDataRegistry.ContainsKey(_id))
         {
-            return spriteDatas[_id].GetSprite(_variant);
+            return spriteDataRegistry[_id].GetSprite(_variant);
         }
         return null;
     }
 
     public Sprite GetSprite(string _id, List<string> _variants)
     {
-        if (spriteDatas != null && spriteDatas.ContainsKey(_id))
+        if (spriteDataRegistry != null && spriteDataRegistry.ContainsKey(_id))
         {
-            var _sv = spriteDatas[_id];
+            var _sv = spriteDataRegistry[_id];
 
             if (_variants == null || _variants.Count == 0)
             {
@@ -389,6 +389,7 @@ public sealed class AssetManager
 
             return _sv.GetDefaultSprite(); ;
         }
+
         return null;
     }
 }
