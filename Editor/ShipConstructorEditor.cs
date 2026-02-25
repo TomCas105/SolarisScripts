@@ -76,6 +76,7 @@ public class ShipConstructorEditor : Editor
         {
             return;
         }
+
         foreach (var _turretHardpoint in _ship.GetShipType().turretHardpoints)
         {
             Vector3 _offset = RotatePointAroundPivot(_turretHardpoint.Position, Vector3.zero, _ship.transform.eulerAngles);
@@ -108,6 +109,12 @@ public class ShipConstructorEditor : Editor
             Handles.color = new Color(1, 0, 0, 1f);
             Handles.DrawWireDisc(_position, Vector3.forward, 0.1f * (1 + _turretHardpoint.Size), 3f);
 
+            var _style = new GUIStyle();
+            _style.alignment = TextAnchor.UpperLeft;
+            _style.normal.textColor = new Color(1, 1, 0, 1f);
+            _style.fontSize = 15;
+
+            Handles.Label(_position, _turretHardpoint.Id, _style);
         }
     }
 
