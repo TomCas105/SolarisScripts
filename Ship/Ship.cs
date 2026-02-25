@@ -7,7 +7,7 @@ using UnityEngine.Rendering.Universal;
 [System.Serializable]
 public class Ship : MonoBehaviour
 {
-    private const float CREW_HULL_REPAIR_SPEED = 0.002f;
+    private const float CREW_HULL_REPAIR_SPEED = 0.003f;
     private const float CREW_BREACH_REPAIR_SPEED = 0.01f;
     private const float HEAT_DAMAGE_PER_SECOND = 0.005f;
     private const float PERCENT_CREW_LOSS_FROM_OXYGEN = 0.01f;
@@ -55,7 +55,7 @@ public class Ship : MonoBehaviour
 
         foreach (var _module in shipLoadoutData.equipment)
         {
-            _ship.AddEquipment(_module);
+            _ship.AddEquipment(_module, false);
         }
 
         _ship.InitializeShip();
@@ -420,12 +420,15 @@ public class Ship : MonoBehaviour
     {
         float _equipmentWeight = 0f;
 
-        foreach (var turret in TurretHardpoints)
+        if (TurretHardpoints != null)
         {
-            if (turret.Turret != null)
+            foreach (var turret in TurretHardpoints)
             {
-                turret.Turret.UpdateStats();
-                _equipmentWeight += turret.Turret.Weight;
+                if (turret.Turret != null)
+                {
+                    turret.Turret.UpdateStats();
+                    _equipmentWeight += turret.Turret.Weight;
+                }
             }
         }
 
@@ -781,7 +784,7 @@ public class Ship : MonoBehaviour
         return true;
     }
 
-    public void AddEquipment(string equipmentId)
+    public void AddEquipment(string equipmentId, bool update = true)
     {
         EquipmentData equipment = AssetManager.Instance.GetEquipmentData(equipmentId);
 
@@ -793,16 +796,22 @@ public class Ship : MonoBehaviour
         if (equipment.equipmentType == "refit" && EquippedRefits.Count < shipType.refitSlots)
         {
             EquippedRefits.Add(equipment);
-            AddBuff(equipment.linkedBuff);
+            if (update)
+            {
+                AddBuff(equipment.linkedBuff);
+            }
         }
         else if (equipment.equipmentType == "module" && EquippedModules.Count < shipType.moduleSlots)
         {
             EquippedModules.Add(equipment);
-            AddBuff(equipment.linkedBuff);
+            if (update)
+            {
+                AddBuff(equipment.linkedBuff);
+            }
         }
     }
 
-    public void AddBuff(string buffId)
+    public void AddBuff(string buffId, bool update = true)
     {
         BuffData buff = AssetManager.Instance.GetBuffData(buffId);
 
@@ -813,8 +822,11 @@ public class Ship : MonoBehaviour
 
         Buffs.Add(buff);
 
-        UpdateStats();
-        UpdateShield();
+        if (update)
+        {
+            UpdateStats();
+            UpdateShield();
+        }
     }
 
     public void RemoveBuff(string buffId)
@@ -1005,7 +1017,7 @@ public class Ship : MonoBehaviour
 
             if (CurrentOxygenAmount <= 0f)
             {
-                _crewLoss += CurrentCrewAmount * PERCENT_CREW_LOSS_FROM_OXYGEN;
+                _crewLoss += Mathf.Max(1f, CurrentCrewAmount * PERCENT_CREW_LOSS_FROM_OXYGEN);
             }
 
             float _crewDelta = (CrewRegeneration - CrewDrain - _crewLoss) * _time;
