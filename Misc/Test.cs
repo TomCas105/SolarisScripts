@@ -24,6 +24,7 @@ public class Test : MonoBehaviour
     public List<TargetFilter> targets;
 
     public Camera mainCamera;
+    private int spawnIndex = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -70,12 +71,17 @@ public class Test : MonoBehaviour
         {
             Vector2 _mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
 
-            var _ship = Ship.Instantiate(shipLoadoutDatas[0], _mousePos, "pirate");
+            var _ship = Ship.Instantiate(shipLoadoutDatas[spawnIndex], _mousePos, "pirate");
         }
         else if (Input.GetMouseButtonDown(1))
         {
             Vector2 _mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            var _ship = Ship.Instantiate(shipLoadoutDatas[0], _mousePos, "player");
+            var _ship = Ship.Instantiate(shipLoadoutDatas[spawnIndex], _mousePos, "player");
+        }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            spawnIndex = (spawnIndex + 1) % shipLoadoutDatas.Count;
+            Debug.Log("Selected loadout: " + shipLoadoutDatas[spawnIndex].id);
         }
     }
 }
