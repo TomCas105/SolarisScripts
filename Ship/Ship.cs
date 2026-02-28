@@ -1199,7 +1199,7 @@ public class Ship : MonoBehaviour
             return 0f;
         }
 
-        float _armorPercentage = CurrentArmorHitpoints / (MaxArmorHitpoints * (1 - ArmorQuality));
+        float _armorPercentage = (CurrentArmorHitpoints * (1 + ArmorQuality)) / MaxArmorHitpoints ;
 
         return ArmorThickness * Mathf.Clamp01(_armorPercentage);
     }
