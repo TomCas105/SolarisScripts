@@ -10,7 +10,7 @@ using UnityEngine;
 [System.Serializable]
 public class ModuleInfo
 {
-    private static readonly Dictionary<string, Type> typeMap = new()
+    private static readonly Dictionary<string, Type> dataTypeMap = new()
     {
         { "Sprite", typeof(SpriteData) },
         { "Sound", typeof(SoundData) },
@@ -22,10 +22,11 @@ public class ModuleInfo
         { "Turret", typeof(TurretData) },
         { "Equipment", typeof(EquipmentData) },
         { "Ship", typeof(ShipData) },
-        { "ShipLoadout", typeof(ShipLoadoutData) }
+        { "ShipLoadout", typeof(ShipLoadoutData) },
+        { "FactionLoadoutSet", typeof(FactionLoadoutSetData) }
     };
 
-    private static readonly Dictionary<Type, Action<DataDefinition>> registryMap = new()
+    private static readonly Dictionary<Type, Action<DataDefinition>> dataRegistryMap = new()
     {
         { typeof(SpriteData), d => AssetManager.Instance.AddSpriteData((SpriteData)d) },
         { typeof(SoundData), d => AssetManager.Instance.AddSoundData((SoundData)d) },
@@ -37,7 +38,8 @@ public class ModuleInfo
         { typeof(TurretData), d => AssetManager.Instance.AddTurretData((TurretData)d) },
         { typeof(EquipmentData), d => AssetManager.Instance.AddEquipmentData((EquipmentData)d) },
         { typeof(ShipData), d => AssetManager.Instance.AddShipData((ShipData)d) },
-        { typeof(ShipLoadoutData), d => AssetManager.Instance.AddShipLoadoutData((ShipLoadoutData)d)   }
+        { typeof(ShipLoadoutData), d => AssetManager.Instance.AddShipLoadoutData((ShipLoadoutData)d)   },
+        { typeof(FactionLoadoutSetData), d => AssetManager.Instance.AddFactionLoadoutSetData((FactionLoadoutSetData)d)   }
     };
 
     public string id = "id";
@@ -132,7 +134,7 @@ public class ModuleInfo
             return null;
         }
 
-        if (!typeMap.TryGetValue(_baseData.dataType, out var targetType))
+        if (!dataTypeMap.TryGetValue(_baseData.dataType, out var targetType))
         {
             return null;
         }
@@ -142,7 +144,7 @@ public class ModuleInfo
 
     private void RegisterItem(DataDefinition data)
     {
-        if (registryMap.TryGetValue(data.GetType(), out var action))
+        if (dataRegistryMap.TryGetValue(data.GetType(), out var action))
         {
             action.Invoke(data);
         }

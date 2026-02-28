@@ -65,6 +65,7 @@ public sealed class AssetManager
     public Dictionary<string, EquipmentData> equipmentDataRegistry;
     public Dictionary<string, ShipData> shipDataRegistry;
     public Dictionary<string, ShipLoadoutData> shipLoadoutDataRegistry;
+    public Dictionary<string, FactionLoadoutSetData> factionLoadoutSetDataRegistry;
 
     private AssetManager()
     {
@@ -80,6 +81,7 @@ public sealed class AssetManager
         equipmentDataRegistry = new();
         shipDataRegistry = new();
         shipLoadoutDataRegistry = new();
+        factionLoadoutSetDataRegistry = new();
 
         loadedMaterials = new();
     }
@@ -157,117 +159,129 @@ public sealed class AssetManager
         }
     }
 
-    public void AddSpriteData(SpriteData _spriteData)
+    public void AddSpriteData(SpriteData _data)
     {
-        if (spriteDataRegistry.ContainsKey(_spriteData.id))
+        if (spriteDataRegistry.ContainsKey(_data.id))
         {
-            Log("merging sprites: " + _spriteData.id, LOG_WARNING);
-            spriteDataRegistry[_spriteData.id].Merge(_spriteData);
+            Log("merging sprites: " + _data.id, LOG_NORMAL);
+            spriteDataRegistry[_data.id].Merge(_data);
         }
         else
         {
-            spriteDataRegistry.Add(_spriteData.id, _spriteData);
+            spriteDataRegistry.Add(_data.id, _data);
         }
     }
 
-    public void AddSoundData(SoundData _soundData)
+    public void AddSoundData(SoundData _data)
     {
-        if (soundDataRegistry.ContainsKey(_soundData.id))
+        if (soundDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing sound: " + _soundData.id, LOG_WARNING);
-            soundDataRegistry.Remove(_soundData.id);
+            Log("replacing sound: " + _data.id, LOG_WARNING);
+            soundDataRegistry.Remove(_data.id);
         }
-        soundDataRegistry.Add(_soundData.id, _soundData);
+        soundDataRegistry.Add(_data.id, _data);
     }
 
-    public void AddEffectData(EffectData _effectData)
+    public void AddEffectData(EffectData _data)
     {
-        if (effectDataRegistry.ContainsKey(_effectData.id))
+        if (effectDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing effect: " + _effectData.id, LOG_WARNING);
-            effectDataRegistry.Remove(_effectData.id);
+            Log("replacing effect: " + _data.id, LOG_WARNING);
+            effectDataRegistry.Remove(_data.id);
         }
-        effectDataRegistry.Add(_effectData.id, _effectData);
+        effectDataRegistry.Add(_data.id, _data);
     }
 
-    public void AddBuffData(BuffData _buffData)
+    public void AddBuffData(BuffData _data)
     {
-        if (buffDataRegistry.ContainsKey(_buffData.id))
+        if (buffDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing buff: " + _buffData.id, LOG_WARNING);
-            buffDataRegistry.Remove(_buffData.id);
+            Log("replacing buff: " + _data.id, LOG_WARNING);
+            buffDataRegistry.Remove(_data.id);
         }
-        buffDataRegistry.Add(_buffData.id, _buffData);
+        buffDataRegistry.Add(_data.id, _data);
     }
 
-    public void AddFaction(FactionData _faction)
+    public void AddFaction(FactionData _data)
     {
-        if (factionDataRegistry.ContainsKey(_faction.id))
+        if (factionDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing faction: " + _faction.id, LOG_WARNING);
-            factionDataRegistry.Remove(_faction.id);
+            Log("replacing faction: " + _data.id, LOG_WARNING);
+            factionDataRegistry.Remove(_data.id);
         }
-        factionDataRegistry.Add(_faction.id, _faction);
+        factionDataRegistry.Add(_data.id, _data);
     }
 
-    public void AddShieldData(ShieldData _shield)
+    public void AddShieldData(ShieldData _data)
     {
-        if (shieldDataRegistry.ContainsKey(_shield.id))
+        if (shieldDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing shield: " + _shield.id, LOG_WARNING);
-            shieldDataRegistry.Remove(_shield.id);
+            Log("replacing shield: " + _data.id, LOG_WARNING);
+            shieldDataRegistry.Remove(_data.id);
         }
-        shieldDataRegistry.Add(_shield.id, _shield);
+        shieldDataRegistry.Add(_data.id, _data);
     }
 
-    public void AddArmorData(ArmorData _armor)
+    public void AddArmorData(ArmorData _data)
     {
-        if (armorDataRegistry.ContainsKey(_armor.id))
+        if (armorDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing armor: " + _armor.id, LOG_WARNING);
-            armorDataRegistry.Remove(_armor.id);
+            Log("replacing armor: " + _data.id, LOG_WARNING);
+            armorDataRegistry.Remove(_data.id);
         }
-        armorDataRegistry.Add(_armor.id, _armor);
+        armorDataRegistry.Add(_data.id, _data);
     }
 
-    public void AddTurretData(TurretData _turret)
+    public void AddTurretData(TurretData _data)
     {
-        if (turretDataRegistry.ContainsKey(_turret.id))
+        if (turretDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing turret: " + _turret.id, LOG_WARNING);
-            turretDataRegistry.Remove(_turret.id);
+            Log("replacing turret: " + _data.id, LOG_WARNING);
+            turretDataRegistry.Remove(_data.id);
         }
-        turretDataRegistry.Add(_turret.id, _turret);
+        turretDataRegistry.Add(_data.id, _data);
     }
 
-    public void AddEquipmentData(EquipmentData _equipment)
+    public void AddEquipmentData(EquipmentData _data)
     {
-        if (equipmentDataRegistry.ContainsKey(_equipment.id))
+        if (equipmentDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing equipment: " + _equipment.id, LOG_WARNING);
-            equipmentDataRegistry.Remove(_equipment.id);
+            Log("replacing equipment: " + _data.id, LOG_WARNING);
+            equipmentDataRegistry.Remove(_data.id);
         }
-        equipmentDataRegistry.Add(_equipment.id, _equipment);
+        equipmentDataRegistry.Add(_data.id, _data);
     }
 
-    public void AddShipData(ShipData _ship)
+    public void AddShipData(ShipData _data)
     {
-        if (shipDataRegistry.ContainsKey(_ship.id))
+        if (shipDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing ship: " + _ship.id, LOG_WARNING);
-            shipDataRegistry.Remove(_ship.id);
+            Log("replacing ship: " + _data.id, LOG_WARNING);
+            shipDataRegistry.Remove(_data.id);
         }
-        shipDataRegistry.Add(_ship.id, _ship);
+        shipDataRegistry.Add(_data.id, _data);
     }
 
-    public void AddShipLoadoutData(ShipLoadoutData _loadout)
+    public void AddShipLoadoutData(ShipLoadoutData _data)
     {
-        if (shipLoadoutDataRegistry.ContainsKey(_loadout.id))
+        if (shipLoadoutDataRegistry.ContainsKey(_data.id))
         {
-            Log("replacing ship loadout: " + _loadout.id, LOG_WARNING);
-            shipLoadoutDataRegistry.Remove(_loadout.id);
+            Log("replacing ship loadout: " + _data.id, LOG_WARNING);
+            shipLoadoutDataRegistry.Remove(_data.id);
         }
-        shipLoadoutDataRegistry.Add(_loadout.id, _loadout);
+        shipLoadoutDataRegistry.Add(_data.id, _data);
+    }
+    public void AddFactionLoadoutSetData(FactionLoadoutSetData _data)
+    {
+        if (shipLoadoutDataRegistry.ContainsKey(_data.id))
+        {
+            Log("merging faction loadout set: " + _data.id, LOG_NORMAL);
+            factionLoadoutSetDataRegistry[_data.id].Merge(_data);
+        }
+        else
+        {
+            factionLoadoutSetDataRegistry.Add(_data.id, _data);
+        }
     }
 
     public SoundData GetSoundData(string _id)
@@ -355,6 +369,15 @@ public sealed class AssetManager
         if (shipLoadoutDataRegistry.ContainsKey(_id))
         {
             return shipLoadoutDataRegistry[_id];
+        }
+        return null;
+    }
+
+    public FactionLoadoutSetData GetFactionLoadoutSetData(string _id)
+    {
+        if (factionLoadoutSetDataRegistry.ContainsKey(_id))
+        {
+            return factionLoadoutSetDataRegistry[_id];
         }
         return null;
     }
