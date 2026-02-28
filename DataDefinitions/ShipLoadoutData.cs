@@ -7,6 +7,8 @@ public record ShipLoadoutData : DataDefinition
         public string turretID = "turret";
         public string hardpoint = "s0";
     }
+    public int minTechLevel = 0;
+    public int maxTechLevel = 100;
 
     public string shipID = "ship";
 

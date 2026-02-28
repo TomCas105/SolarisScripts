@@ -32,6 +32,7 @@ public record SpriteData : DataDefinition
         LoadedSpriteVariants = new();
         LoadedRandomSprites = new();
     }
+
     public override void OnPostLoad(string modulePath)
     {
         LoadSprites(modulePath);
