@@ -7,7 +7,7 @@ public record EquipmentBaseData : DataDefinition
     public int cost = 50; //market cost
     public float weight = 25f; // weight in 10s of tonnes
     public string[] tags = { }; //used for applying bonuses and for filtering in shop - Energy, Kinetic, Railgun, Armor, Shield, Hull, Crew...
-    public Requirement[] requirements = { }; //equipment can only be installed on ships that have one of these requirements fulfilled
+    public TagRequirement[] requirements = { }; //equipment can only be installed on ships that have one of these requirements fulfilled
 
     public string iconSpriteID = "";
     public float iconScale = 1f; //scaling of the UI icon

@@ -8,7 +8,7 @@ public record DataDefinition
 }
 
 [System.Serializable]
-public struct Requirement
+public struct TagRequirement
 {
     public string[] requiredTags;
 }
