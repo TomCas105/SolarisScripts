@@ -8,7 +8,7 @@ public record BuffData : DataDefinition
     [System.Serializable]
     public record TurretBuffData
     {
-        public string[] requiredTags; //turret must have all these tags for buff to apply
+        public Requirement requirement; //turret must have all these tags for buff to apply
         public StatValue[] statValues;
 
         public float Get(string stat, string modifier)

@@ -6,3 +6,9 @@ public record DataDefinition
 
     public virtual void OnPostLoad(string moduleRootPath) { }
 }
+
+[System.Serializable]
+public struct Requirement
+{
+    public string[] requiredTags;
+}

@@ -342,25 +342,27 @@ public abstract class Turret : MonoBehaviour
 
             foreach (var turretBuff in buff.turretBuffs)
             {
-                if (turretBuff.requiredTags == null || turretBuff.requiredTags.Length == 0)
+                var _requirement = turretBuff.requirement;
+
+                if (_requirement.requiredTags == null || _requirement.requiredTags.Length == 0)
                 {
                     turretBuffs.Add(turretBuff);
                     continue;
                 }
 
                 int k = 0;
-                for (int i = 0; i < turretBuff.requiredTags.Length; i++)
+                for (int i = 0; i < _requirement.requiredTags.Length; i++)
                 {
                     for (int j = 0; j < turretData.tags.Length; j++)
                     {
-                        if (turretData.tags[j] == turretBuff.requiredTags[i])
+                        if (turretData.tags[j] == _requirement.requiredTags[i])
                         {
                             k++;
                         }
                     }
                 }
 
-                if (k == turretBuff.requiredTags.Length)
+                if (k == _requirement.requiredTags.Length)
                 {
                     turretBuffs.Add(turretBuff);
                 }
