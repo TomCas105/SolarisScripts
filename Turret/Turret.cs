@@ -377,39 +377,19 @@ public abstract class Turret : MonoBehaviour
         TargetFilter _newTarget = currentTarget;
         float _max = float.MaxValue;
 
-        if (currentTarget == null && _newTarget == null)
-        {
-            var _targets = TargetFilter.GetHostileTargets(turretFaction, 0);
-            if (_targets != null && _targets.Count > 0)
-            {
-                foreach (var _target in _targets)
-                {
-                    if (_target != OwnerShip.ShipTargetFilter && CanFireAt(_target))
-                    {
-                        float _rangeSqr = (_target.transform.position - transform.position).sqrMagnitude;
-                        if (_rangeSqr < _max * _max)
-                        {
-                            _max = _rangeSqr;
-                            _newTarget = _target;
-                        }
-                    }
-                }
-            }
-        }
-
         if (turretData.pointDefense)
         {
-            if (_newTarget != null && _newTarget.Type != 2)
+            if (_newTarget == null || _newTarget.Type != 2)
             {
                 var _targets = TargetFilter.GetHostileTargets(turretFaction, 2);
                 if (_targets != null && _targets.Count > 0)
                 {
                     foreach (var _target in _targets)
                     {
-                        if (CanFireAt(_target))
+                        if (IsMissileThreatening(_target) && CanFireAt(_target))
                         {
                             float _rangeSqr = (_target.transform.position - transform.position).sqrMagnitude;
-                            if (_rangeSqr < _max * _max)
+                            if (_rangeSqr < _max)
                             {
                                 _max = _rangeSqr;
                                 _newTarget = _target;
@@ -429,11 +409,33 @@ public abstract class Turret : MonoBehaviour
                         if (CanFireAt(_target))
                         {
                             float _rangeSqr = (_target.transform.position - transform.position).sqrMagnitude;
-                            if (_rangeSqr < _max * _max)
+                            if (_rangeSqr < _max)
                             {
                                 _max = _rangeSqr;
                                 _newTarget = _target;
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (_newTarget == null)
+        {
+            var _targets = TargetFilter.GetHostileTargets(turretFaction, 0);
+
+            if (_targets != null && _targets.Count > 0)
+            {
+                foreach (var _target in _targets)
+                {
+                    if (_target != OwnerShip.ShipTargetFilter && CanFireAt(_target))
+                    {
+                        float _rangeSqr = (_target.transform.position - transform.position).sqrMagnitude;
+
+                        if (_rangeSqr < _max)
+                        {
+                            _max = _rangeSqr;
+                            _newTarget = _target;
                         }
                     }
                 }
@@ -445,7 +447,8 @@ public abstract class Turret : MonoBehaviour
 
     private void EngageCurrentTarget()
     {
-        if (CanFireAt(currentTarget))
+        if (CanFireAt(currentTarget)
+            && (!IsPointDefense || IsMissileThreatening(currentTarget)))
         {
             if (turretData.launchPoints == null || turretData.launchPoints.Length < 1)
             {
@@ -490,8 +493,17 @@ public abstract class Turret : MonoBehaviour
         else
         {
             currentTarget = null;
+
             FindNewTarget();
-            retargetDelay = Mathf.Min(1f, Period);
+
+            if (IsPointDefense)
+            {
+                retargetDelay = 0.25f;
+            }
+            else
+            {
+                retargetDelay = Mathf.Min(1f, Period);
+            }
         }
     }
 
@@ -556,6 +568,50 @@ public abstract class Turret : MonoBehaviour
         }
 
         return true;
+    }
+
+    protected virtual bool IsMissileThreatening(TargetFilter missile)
+    {
+        Vector2 velocity = missile.GetVelocity();
+
+        float velSqr = velocity.sqrMagnitude;
+
+        if (velSqr < 0.01f)
+        {
+            return false;
+        }
+
+        Vector2 toShip = (Vector2)transform.position - (Vector2)missile.transform.position;
+
+        float dot = Vector2.Dot(velocity, toShip);
+
+        if (dot <= 0f)
+        {
+            return false;
+        }
+
+        float toShipSqr = toShip.sqrMagnitude;
+
+        if (dot * dot < velSqr * toShipSqr * 0.9f)
+        {
+            return false;
+        }
+
+        float timeToImpact = dot / velSqr;
+
+        if (timeToImpact <= 0f)
+        {
+            return false;
+        }
+
+        Vector2 dirToMissile = ((Vector2)missile.transform.position - (Vector2)transform.position).normalized;
+
+        float angle = Vector2.SignedAngle(transform.up, dirToMissile);
+        float absAngle = Mathf.Abs(angle);
+
+        float timeToTurn = absAngle / TurnRate + 0.25f;
+
+        return timeToTurn <= timeToImpact;
     }
 
     protected virtual float GetAngleToTarget(TargetFilter _target)

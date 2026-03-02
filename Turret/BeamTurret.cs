@@ -64,7 +64,13 @@ public class BeamTurret : Turret
             float _projectileAngle = Mathf.Atan2(_projectileDirection.y, _projectileDirection.x) * Mathf.Rad2Deg;
             float _impactAngle = 90f - Mathf.Abs(Mathf.DeltaAngle(_surfaceAngle, _projectileAngle));
 
-            _target.TakeDamage(TurretDamageData, OwnerShip, Vector2.Distance(_launchPoint, _hit.point), Range, _impactAngle);
+            Ship _ownerShip = null;
+            if (OwnerShip != null)
+            {
+                _ownerShip = OwnerShip;
+            }
+
+            _target.TakeDamage(TurretDamageData, _ownerShip, Vector2.Distance(_launchPoint, _hit.point), Range, _impactAngle);
 
             Destroy(_beam, turretData.trailData.duration);
         }

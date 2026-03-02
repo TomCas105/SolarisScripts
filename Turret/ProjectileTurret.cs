@@ -164,6 +164,7 @@ public class ProjectileTurret : Turret
 
             var _projectile = new GameObject(turretData.id + "_projectile").AddComponent<Projectile>();
             _projectile.isMissile = turretData.isMissile;
+            _projectile.hitMissiles = turretData.pointDefense;
             _projectile.damageData = TurretDamageData;
             _projectile.projectileVelocity = ProjectileVelocity;
             _projectile.projectileTurnRate = ProjectileTurnRate;
@@ -171,7 +172,7 @@ public class ProjectileTurret : Turret
             _projectile.range = Range;
             _projectile.impactEffect = impactEffect;
             _projectile.impactSound = impactSound;
-            _projectile.ownerShip = OwnerShip;
+            _projectile.OwnerShip = OwnerShip;
 
             if (turretData.projectileTurnRate > 0f)
             {
@@ -207,7 +208,6 @@ public class ProjectileTurret : Turret
 
     protected override bool CanFireAt(TargetFilter target)
     {
-        //check range
         Vector2 _transformPos = transform.position;
         Vector2 _targetPos = target.transform.position;
 
@@ -265,12 +265,13 @@ public class Projectile : MonoBehaviour
     public float projectileVelocity = 10f; //projectile velocity in 100s of meters per second
     public float projectileTurnRate = 0f; //determines the turning speed of the projectile and enables homing onto the target
     public bool isMissile = false; //whether the projectile is classified as missile and can be targeted by PD turrets
+    public bool hitMissiles = false; //whether the projectile can hit missiles, used for PD turrets' projectiles
     public float missileHitpoints = 50f; //durability of the missile
     public float missileCollisionRadius = 0.1f; //collison radius of the missile
     public int projectilesPerAttack = 1; //number of projectiles launched, can be used to make shotgun-type weapons
     public float range = 10f;
 
-    public Ship ownerShip;
+    public Ship OwnerShip { get; set; }
     public TargetFilter thisTargetFilter;
     public TargetFilter homingTarget;
     public FactionData projectileFaction;
@@ -302,7 +303,13 @@ public class Projectile : MonoBehaviour
             {
                 var _target = _hit.collider.GetComponent<TargetFilter>();
 
-                if (_target == null || _target == thisTargetFilter || !CheckAlliance(_target))
+
+                if (
+                    _target == null
+                    || _target == thisTargetFilter
+                    || (!hitMissiles && _target.Type == 2)
+                    || !CheckAlliance(_target)
+                    )
                 {
                     continue;
                 }
@@ -437,11 +444,28 @@ public class Projectile : MonoBehaviour
         float _impactAngle = 90f - Mathf.Abs(Mathf.DeltaAngle(_surfaceAngle, _projectileAngle));
         surfaceImpactAngle = _surfaceAngle - 90f;
 
-        return _target.TakeDamage(damageData, ownerShip, traveledDistance, range, _impactAngle);
+        if (_target == null)
+        {
+            Debug.LogError("Null target in projectile collision");
+        }
+
+        Ship _ownerShip = null;
+        if (OwnerShip != null)
+        {
+            _ownerShip = OwnerShip;
+        }
+
+        return _target.TakeDamage(damageData, _ownerShip, traveledDistance, range, _impactAngle);
     }
 
     private void DestroyProjectile()
     {
+        if (thisTargetFilter != null)
+        {
+            TargetFilter.targets.Remove(thisTargetFilter);
+            Destroy(thisTargetFilter);
+        }
+
         if (impactEffect != null)
         {
             var _impactEffect = Effect.InstantiateEffect(impactEffect);
@@ -489,7 +513,6 @@ public class Projectile : MonoBehaviour
         }
 
         StartCoroutine(FadeOut(_trailRenderer));
-        Destroy(GetComponent<TargetFilter>());
         Destroy(gameObject, _trailRenderer.time);
     }
 
