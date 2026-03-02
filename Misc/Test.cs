@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -72,11 +73,19 @@ public class Test : MonoBehaviour
             Vector2 _mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
 
             var _ship = Ship.Instantiate(shipLoadoutDatas[spawnIndex], _mousePos, "pirate");
+            _ship.AddComponent<PrimitiveShipAI>();
         }
         else if (Input.GetMouseButtonDown(1))
         {
             Vector2 _mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            var _ship = Ship.Instantiate(shipLoadoutDatas[spawnIndex], _mousePos, "empire");
+            _ship.AddComponent<PrimitiveShipAI>();
+        }
+        else if (Input.GetKeyDown(KeyCode.P))
+        {
+            Vector2 _mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             var _ship = Ship.Instantiate(shipLoadoutDatas[spawnIndex], _mousePos, "player");
+            _ship.AddComponent<PlayerShipInput>();
         }
         else if (Input.GetKeyDown(KeyCode.Space))
         {

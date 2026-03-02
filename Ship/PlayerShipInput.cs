@@ -2,13 +2,17 @@ using UnityEngine;
 
 public class PlayerShipInput : MonoBehaviour, IShipInputProvider
 {
-    public Ship attachedShip;
+    public Ship AttachedShip { get; set; }
 
     public int cruiseControl;
 
     void Awake()
     {
-        attachedShip.ShipInputProvider = this;
+        if (AttachedShip == null)
+        {
+            AttachedShip = GetComponent<Ship>();
+            AttachedShip.ShipInputProvider = this;
+        }
     }
 
     void LateUpdate()
