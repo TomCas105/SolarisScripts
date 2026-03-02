@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -13,7 +14,6 @@ public class Ship : MonoBehaviour
     private const float PERCENT_CREW_LOSS_FROM_OXYGEN = 0.01f;
 
     public enum TurretRangeType
-
     {
         NORMAL,
         DEFENSIVE,
@@ -356,6 +356,7 @@ public class Ship : MonoBehaviour
         shipRigidbody.angularDamping = 0.25f;
 
         InitializeBuffs();
+        UpdateShipRadius();
 
         buffs = Buffs.ToArray();
 
@@ -773,8 +774,6 @@ public class Ship : MonoBehaviour
                 hullBreaches.Add(new HullBreach(_breachSize, _duration));
             }
         }
-
-        UpdateStats();
 
         if (CurrentHullHitpoints <= 0f)
         {
@@ -1199,7 +1198,7 @@ public class Ship : MonoBehaviour
             return 0f;
         }
 
-        float _armorPercentage = (CurrentArmorHitpoints * (1 + ArmorQuality)) / MaxArmorHitpoints ;
+        float _armorPercentage = (CurrentArmorHitpoints * (1 + ArmorQuality)) / MaxArmorHitpoints;
 
         return ArmorThickness * Mathf.Clamp01(_armorPercentage);
     }
@@ -1220,51 +1219,41 @@ public class Ship : MonoBehaviour
         return IsFacingAngle(Mathf.Atan2(_vector.y, _vector.x) * Mathf.Rad2Deg);
     }
 
-    private float GetTurretsRange(TurretRangeType _rangeType)
+    public float GetTurretsRange(TurretRangeType _rangeType)
     {
-        float _max = 0f;
-        float _min = float.MaxValue;
-        float _avg = 0f;
+        float _sniperRange = 200f;
+        float _defensiveRange = 100f;
+        float _normalRange = 50f;
+
+        List<float> _ranges = new();
 
         int _turretCount = 0;
 
         foreach (var _turretHardpoint in TurretHardpoints)
         {
             var _turret = _turretHardpoint.Turret;
+
             if (_turret != null)
             {
                 _turretCount++;
-                _avg += _turret.Range;
-
-                if (_turret.Range < _min)
-                {
-                    _min = _turret.Range;
-                }
-
-                if (_turret.Range > _max)
-                {
-                    _max = _turret.Range;
-                }
+                _ranges.Add(_turret.Range);
             }
         }
 
-        if (_turretCount == 0)
+        if (_turretCount > 0)
         {
-            _min = 50f;
-            _max = 200f;
-            _avg = 100f;
-        }
-        else
-        {
-            _avg /= _turretCount;
+            _ranges.Sort();
+            _normalRange = _ranges[0];
+            _sniperRange = _ranges[_ranges.Count - 1];
+            _defensiveRange = _ranges[_ranges.Count / 2];
         }
 
         return _rangeType switch
         {
-            TurretRangeType.NORMAL => _min,
-            TurretRangeType.DEFENSIVE => _avg,
-            TurretRangeType.SNIPER => _max,
-            _ => Mathf.Min(_min, 5f),
+            TurretRangeType.NORMAL => _normalRange,
+            TurretRangeType.DEFENSIVE => _defensiveRange,
+            TurretRangeType.SNIPER => _sniperRange,
+            _ => Mathf.Min(_normalRange, 5f),
         };
     }
 
