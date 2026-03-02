@@ -18,7 +18,7 @@ public class ShipEditor : Editor
             var _path = EditorInputDialog.Show("Import Ship", "Enter file path:", "Data/Base/Core/Ships/" + _ship.GetShipType().id + ".json");
 
             var _file = File.OpenText(Application.dataPath + "/" + _path);
-            if (_file != null && _path != "Data/Base/Core/Ships/")
+            if (_file != null && _path != "Data/Base/Core/Defs/Ships/")
             {
                 var json = _file.ReadToEnd();
                 ShipData _shipData = new();
@@ -36,7 +36,7 @@ public class ShipEditor : Editor
         {
             var _path = EditorInputDialog.Show("Export Ship", "Enter file path:", "Data/Base/Core/Ships/" + _ship.GetShipType().id + ".json");
 
-            if (_path != "Data/Base/Core/Ships/")
+            if (_path != "Data/Base/Core/Defs/Ships/")
             {
                 SaveIntoJson(_ship.GetShipType(), _path);
             }

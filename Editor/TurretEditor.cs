@@ -27,7 +27,7 @@ public class TurretEditor : Editor
             var _path = EditorInputDialog.Show("Import Turret", "Enter file path:", "Data/Base/Core/Equipment/Turrets/" + _size + _turret.GetTurretType().id + ".json");
 
             var _file = File.OpenText(Application.dataPath + "/" + _path);
-            if (_file != null && _path != "Data/Base/Core/Equipment/Turrets/" + _size)
+            if (_file != null && _path != "Data/Base/Core/Defs/Equipment/Turrets/" + _size)
             {
                 var json = _file.ReadToEnd();
                 TurretData _turretType = new();
@@ -45,7 +45,7 @@ public class TurretEditor : Editor
         {
             var _path = EditorInputDialog.Show("Export Turret", "Enter file path:", "Data/Base/Core/Equipment/Turrets/" + _size + _turret.GetTurretType().id + ".json");
 
-            if (_path != "Data/Base/Core/Equipment/Turrets/" + _size)
+            if (_path != "Data/Base/Core/Defs/Equipment/Turrets/" + _size)
             {
                 SaveIntoJson(_turret.GetTurretType(), _path);
             }

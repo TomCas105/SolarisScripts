@@ -19,7 +19,7 @@ public class EffectEditor : Editor
             var _path = EditorInputDialog.Show("Import Turret", "Enter file path:", "Data/Base/Core/Effects/" + _effect.GetEffectData().id + ".json");
 
             var _file = File.OpenText(Application.dataPath + "/" + _path);
-            if (_file != null && _path != "Data/Base/Core/Effects/")
+            if (_file != null && _path != "Data/Base/Core/Defs/Effects/")
             {
                 var json = _file.ReadToEnd();
                 EffectData _effectData = new();
@@ -36,7 +36,7 @@ public class EffectEditor : Editor
         {
             var _path = EditorInputDialog.Show("Export Turret", "Enter file path:", "Data/Base/Core/Effects/" + _effect.GetEffectData().id + ".json");
 
-            if (_path != "Data/Base/Core/Effects/")
+            if (_path != "Data/Base/Core/Defs/Effects/")
             {
                 SaveIntoJson(_effect.GetEffectData(), _path);
             }
